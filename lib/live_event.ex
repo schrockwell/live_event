@@ -60,7 +60,7 @@ defmodule LiveEvent do
 
         def handle_event(:on_selected, {MyLiveComponent, "my-component"}, %{at: at}, socket) do
           IO.puts("Selected at \#{at}")
-          {:noreply, socket}
+          {:ok, socket}
         end
       end
 

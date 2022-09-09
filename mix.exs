@@ -9,7 +9,10 @@ defmodule LiveEvent.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: docs(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      description: description(),
+      package: package(),
+      elixirc_paths: elixirc_paths(Mix.env()),
+      source_url: "https://github.com/schrockwell/live_event"
     ]
   end
 
@@ -35,8 +38,18 @@ defmodule LiveEvent.MixProject do
 
   defp docs do
     [
-      extras: ["README.md"],
       main: "LiveEvent"
+    ]
+  end
+
+  defp description do
+    "Standardized events for LiveView"
+  end
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/schrockwell/live_event"}
     ]
   end
 
