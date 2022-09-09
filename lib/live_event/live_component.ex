@@ -1,24 +1,24 @@
-defmodule LiveEvents.LiveComponent do
+defmodule LiveEvent.LiveComponent do
   @moduledoc """
   Add LiveEvent support to LiveComponents.
 
   Simply add
 
-      use LiveEvents.LiveComponent
+      use LiveEvent.LiveComponent
 
-  to your LiveComponent module. See `LiveEvents` for more information on how to emit and handle events.
+  to your LiveComponent module. See `LiveEvent` for more information on how to emit and handle events.
 
-  The macro imports `LiveEvents.emit/3` and hooks into the LiveComponent update lifecycle to
-  add support for the `c:LiveEvents.handle_event/4` callback.
+  The macro imports `LiveEvent.emit/3` and hooks into the LiveComponent update lifecycle to
+  add support for the `c:LiveEvent.handle_event/4` callback.
   """
 
-  import LiveEvents.Internal
+  import LiveEvent.Internal
 
   defmacro __using__(_) do
     quote do
-      @behaviour LiveEvents
-      @before_compile LiveEvents.LiveComponent
-      import LiveEvents, only: [emit: 2, emit: 3]
+      @behaviour LiveEvent
+      @before_compile LiveEvent.LiveComponent
+      import LiveEvent, only: [emit: 2, emit: 3]
     end
   end
 
@@ -37,14 +37,14 @@ defmodule LiveEvents.LiveComponent do
         defoverridable mount: 1
 
         def mount(socket) do
-          socket = LiveEvents.LiveComponent.__mount__(socket, __MODULE__)
+          socket = LiveEvent.LiveComponent.__mount__(socket, __MODULE__)
           super(socket)
         end
       end
     else
       quote do
         def mount(socket) do
-          {:ok, LiveEvents.LiveComponent.__mount__(socket, __MODULE__)}
+          {:ok, LiveEvent.LiveComponent.__mount__(socket, __MODULE__)}
         end
       end
     end
@@ -56,14 +56,14 @@ defmodule LiveEvents.LiveComponent do
         defoverridable update: 2
 
         def update(assigns, socket) do
-          socket = LiveEvents.LiveComponent.__update__(socket, assigns)
+          socket = LiveEvent.LiveComponent.__update__(socket, assigns)
           super(assigns, socket)
         end
       end
     else
       quote do
         def update(assigns, socket) do
-          {:ok, LiveEvents.LiveComponent.__update__(socket, assigns)}
+          {:ok, LiveEvent.LiveComponent.__update__(socket, assigns)}
         end
       end
     end
@@ -73,7 +73,7 @@ defmodule LiveEvents.LiveComponent do
     put_module(socket, module)
   end
 
-  def __update__(socket, %{__message__: %LiveEvents.Event{} = event}) do
+  def __update__(socket, %{__message__: %LiveEvent.Event{} = event}) do
     case get_module(socket).handle_event(
            event.name,
            event.source,

@@ -1,24 +1,24 @@
-defmodule LiveEvents.LiveView do
+defmodule LiveEvent.LiveView do
   @moduledoc """
   Add LiveEvent support to LiveViews.
 
   Simply add
 
-      use LiveEvents.LiveView
+      use LiveEvent.LiveView
 
-  to your LiveView module. See `LiveEvents` for more information on how to emit and handle events.
+  to your LiveView module. See `LiveEvent` for more information on how to emit and handle events.
 
-  The macro imports `LiveEvents.emit/3` and hooks into the LiveView lifecycle to
-  add support for the `c:LiveEvents.handle_event/4` callback.
+  The macro imports `LiveEvent.emit/3` and hooks into the LiveView lifecycle to
+  add support for the `c:LiveEvent.handle_event/4` callback.
   """
 
-  import LiveEvents.Internal
+  import LiveEvent.Internal
 
   defmacro __using__(_) do
     quote do
-      @behaviour LiveEvents
-      on_mount({LiveEvents.LiveView, __MODULE__})
-      import LiveEvents, only: [emit: 2, emit: 3]
+      @behaviour LiveEvent
+      on_mount({LiveEvent.LiveView, __MODULE__})
+      import LiveEvent, only: [emit: 2, emit: 3]
     end
   end
 
@@ -28,13 +28,13 @@ defmodule LiveEvents.LiveView do
      socket
      |> put_module(module)
      |> Phoenix.LiveView.attach_hook(
-       :live_events_info,
+       :live_event_info,
        :handle_info,
        &handle_info/2
      )}
   end
 
-  defp handle_info(%LiveEvents.Event{} = event, socket) do
+  defp handle_info(%LiveEvent.Event{} = event, socket) do
     {:halt,
      get_module(socket).handle_event(
        event.name,

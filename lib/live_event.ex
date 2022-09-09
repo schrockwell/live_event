@@ -1,5 +1,5 @@
-defmodule LiveEvents do
-  import LiveEvents.Internal
+defmodule LiveEvent do
+  import LiveEvent.Internal
 
   @moduledoc """
   Standardized event handling in LiveViews and LiveComponents.
@@ -16,12 +16,12 @@ defmodule LiveEvents do
 
   ## The solution
 
-  LiveEvents standardizes these systems into a singular flow:
+  LiveEvent standardizes these systems into a singular flow:
 
-  - `emit/3` -> `c:LiveEvents.handle_event/4` for sending to a LiveView _or_ LiveComponent
+  - `emit/3` -> `c:LiveEvent.handle_event/4` for sending to a LiveView _or_ LiveComponent
 
-  When `use LiveEvents.LiveComponent` or `use LiveEvents.LiveView` is invoked, it hooks into the lifecycle of the
-  view or component to transparently add support for the `c:LiveEvents.handle_event/4` callback.
+  When `use LiveEvent.LiveComponent` or `use LiveEvent.LiveView` is invoked, it hooks into the lifecycle of the
+  view or component to transparently add support for the `c:LiveEvent.handle_event/4` callback.
 
   ## Event destinations
 
@@ -41,7 +41,7 @@ defmodule LiveEvents do
   <.live_component module={MyComponent} id="foo" on_selected={{__MODULE__, @id}}>
   ```
 
-  In both cases, the event is handled by the `c:LiveEvents.handle_event/4` callback.
+  In both cases, the event is handled by the `c:LiveEvent.handle_event/4` callback.
 
       # On a LiveView OR LiveComponent
       def handle_event(:on_selected, {MyComponent, "foo"}, _payload, socket), do: ...
@@ -50,7 +50,7 @@ defmodule LiveEvents do
 
       defmodule MyLiveView do
         use Phoenix.LiveView
-        use LiveEvents.LiveView
+        use LiveEvent.LiveView
 
         def render(assigns) do
           ~H\"\"\"
@@ -66,7 +66,7 @@ defmodule LiveEvents do
 
       defmodule MyLiveComponent do
         use Phoenix.LiveComponent
-        use LiveEvents.LiveComponent
+        use LiveEvent.LiveComponent
 
         def render(assigns) do
           ~H\"\"\"
@@ -91,8 +91,8 @@ defmodule LiveEvents do
 
   - The arity is different
   - The result is `{:ok, socket}`, not `{:noreply, socket}`
-  - LiveEvents uses atoms for event names, not strings
-  - LiveEvents always originate from the server, not the client
+  - LiveEvent uses atoms for event names, not strings
+  - LiveEvent always originate from the server, not the client
 
   ## Example
 
@@ -154,9 +154,9 @@ defmodule LiveEvents do
 
   To send to a LiveView (or any other process), specify a pid (usually `self()`) as the `destination`.
   To send to a LiveComponent, specify `{module, id}` as the `destination`.
-  The event can handled by the `c:LiveEvents.handle_event/4` callback.
+  The event can handled by the `c:LiveEvent.handle_event/4` callback.
 
-  When sending to an arbitrary process, the message will be a `LiveEvents.Event` struct, although you
+  When sending to an arbitrary process, the message will be a `LiveEvent.Event` struct, although you
   should not normally have to deal with that directly.
 
   ## Options
@@ -179,7 +179,7 @@ defmodule LiveEvents do
         ) ::
           :ok
   def send_event(destination, event_name, payload, opts \\ []) do
-    message = %LiveEvents.Event{name: event_name, source: opts[:source], payload: payload}
+    message = %LiveEvent.Event{name: event_name, source: opts[:source], payload: payload}
 
     case destination do
       pid when is_pid(pid) ->
