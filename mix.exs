@@ -7,7 +7,9 @@ defmodule LiveEvent.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      docs: docs(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -25,9 +27,19 @@ defmodule LiveEvent.MixProject do
       {:makeup_eex, "~> 0.1.1", only: :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:jason, "~> 1.0", only: :test},
-      {:live_isolated_component, "~> 0.3", only: [:test], runtime: false},
+      {:live_isolated_component, "~> 0.5", only: [:test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:phoenix_live_view, "~> 0.16"}
     ]
   end
+
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "LiveEvent"
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
