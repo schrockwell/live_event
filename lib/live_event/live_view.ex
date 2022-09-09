@@ -35,13 +35,18 @@ defmodule LiveEvent.LiveView do
   end
 
   defp handle_info(%LiveEvent.Event{} = event, socket) do
-    {:halt,
-     get_module(socket).handle_event(
-       event.name,
-       event.source,
-       event.payload,
-       socket
-     )}
+    socket =
+      case get_module(socket).handle_event(
+             event.name,
+             event.source,
+             event.payload,
+             socket
+           ) do
+        {:ok, %Phoenix.LiveView.Socket{} = socket} -> socket
+        _unexpected -> raise "expected handle_event/4 to return {:ok, %LiveView.Socket{}}"
+      end
+
+    {:halt, socket}
   end
 
   defp handle_info(_message, socket), do: {:cont, socket}
