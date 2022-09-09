@@ -9,6 +9,35 @@ LiveEvent standardizes the API for emitting and handling events between LiveView
 
 Please see [the docs](https://hexdocs.pm/live_event/) for full documentation and examples.
 
+## Usage
+
+Simply add `use LiveEvent.LiveView` and `use LiveEvent.LiveComponent` to any LiveView or LiveComponent, respectively, to opt-in to LiveEvent's functionality.
+
+Imagine a LiveComponent that has an `:on_selected` event assign that is raised like so:
+
+```elixir
+emit(socket, :on_selected)
+```
+
+To handle the event on a LiveView, pass a pid to the event assign.
+
+```heex
+<.live_component module={MyComponent} id="foo" on_selected={self()}>
+```
+
+To handle the event on a LiveComponent, pass `{module, id}` to the event assign.
+
+```heex
+<.live_component module={MyComponent} id="foo" on_selected={{__MODULE__, @id}}>
+```
+
+In both cases, the event is handled by the `c:LiveEvent.handle_event/4` callback.
+
+```elixir
+# On a LiveView OR LiveComponent
+def handle_event(:on_selected, {MyComponent, "foo"}, _payload, socket), do: ...
+```
+
 ## Example
 
 ```elixir
