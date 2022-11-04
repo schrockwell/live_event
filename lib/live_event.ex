@@ -18,10 +18,10 @@ defmodule LiveEvent do
 
   LiveEvent standardizes these systems into a singular flow:
 
-  - `emit/3` -> `c:LiveEvent.handle_event/4` for sending to a LiveView _or_ LiveComponent
+  - `emit/3` -> `c:LiveEvent.handle_emit/4` for sending to a LiveView _or_ LiveComponent
 
   When `use LiveEvent.LiveComponent` or `use LiveEvent.LiveView` is invoked, it hooks into the lifecycle of the
-  view or component to transparently add support for the `c:LiveEvent.handle_event/4` callback.
+  view or component to transparently add support for the `c:LiveEvent.handle_emit/4` callback.
 
   ## Event destinations
 
@@ -41,10 +41,10 @@ defmodule LiveEvent do
   <.live_component module={MyComponent} id="foo" on_selected={{__MODULE__, @id}}>
   ```
 
-  In both cases, the event is handled by the `c:LiveEvent.handle_event/4` callback.
+  In both cases, the event is handled by the `c:LiveEvent.handle_emit/4` callback.
 
       # On a LiveView OR LiveComponent
-      def handle_event(:on_selected, {MyComponent, "foo"}, _payload, socket), do: ...
+      def handle_emit(:on_selected, {MyComponent, "foo"}, _payload, socket), do: ...
 
   # Example
 
@@ -58,7 +58,7 @@ defmodule LiveEvent do
           \"\"\"
         end
 
-        def handle_event(:on_selected, {MyLiveComponent, "my-component"}, %{at: at}, socket) do
+        def handle_emit(:on_selected, {MyLiveComponent, "my-component"}, %{at: at}, socket) do
           IO.puts("Selected at \#{at}")
           {:ok, socket}
         end
@@ -74,7 +74,7 @@ defmodule LiveEvent do
           \"\"\"
         end
 
-        def handle_event("click", _, socket) do
+        def handle_emit("click", _, socket) do
           {:noreply, emit(socket, :on_selected, %{at: DateTime.utc_now()})}
         end
       end
@@ -85,9 +85,9 @@ defmodule LiveEvent do
 
   Events sent via `emit/3` have a `source` argument of the form `{module, id}`.
 
-  ## Compared to `handle_event/3`
+  ## Compared to `handle_emit/3`
 
-  This callback is distinct from LiveView's `handle_event/3` callback in a few important ways:
+  This callback is distinct from LiveView's `handle_emit/3` callback in a few important ways:
 
   - The arity is different
   - The result is `{:ok, socket}`, not `{:noreply, socket}`
@@ -96,10 +96,10 @@ defmodule LiveEvent do
 
   ## Example
 
-      def handle_event(:on_profile_selected, {MyLiveComponent, _id}, profile_id, socket), do: ...
+      def handle_emit(:on_profile_selected, {MyLiveComponent, _id}, profile_id, socket), do: ...
 
   """
-  @callback handle_event(
+  @callback handle_emit(
               name :: atom,
               source :: any,
               payload :: any,
@@ -107,7 +107,7 @@ defmodule LiveEvent do
             ) ::
               {:ok, socket :: LiveView.Socket.t()}
 
-  @optional_callbacks handle_event: 4
+  @optional_callbacks handle_emit: 4
 
   @doc """
   Raise an event from a LiveView or LiveComponent.
@@ -154,7 +154,7 @@ defmodule LiveEvent do
 
   To send to a LiveView (or any other process), specify a pid (usually `self()`) as the `destination`.
   To send to a LiveComponent, specify `{module, id}` as the `destination`.
-  The event can handled by the `c:LiveEvent.handle_event/4` callback.
+  The event can handled by the `c:LiveEvent.handle_emit/4` callback.
 
   When sending to an arbitrary process, the message will be a `LiveEvent.Event` struct, although you
   should not normally have to deal with that directly.
@@ -166,10 +166,10 @@ defmodule LiveEvent do
   ## Examples
 
       send_event(self(), :on_selected, %{profile_id: 123})
-      # => def handle_event(:on_selected, _source, %{profile_id: id}, socket), do: ...
+      # => def handle_emit(:on_selected, _source, %{profile_id: id}, socket), do: ...
 
       send_event({MyComponent, "my-id"}, :on_selected, %{profile_id: 123})
-      # => def handle_event(:on_selected, _source, %{profile_id: id}, socket), do: ...
+      # => def handle_emit(:on_selected, _source, %{profile_id: id}, socket), do: ...
   """
   @spec send_event(
           destination :: LiveView.Event.destination(),

@@ -29,7 +29,7 @@ defmodule LiveEventTest do
       {:ok, assign(socket, :payload, nil)}
     end
 
-    def handle_event(:event, _source, payload, socket) do
+    def handle_emit(:event, _source, payload, socket) do
       {:ok, assign(socket, :payload, payload)}
     end
 
@@ -55,7 +55,7 @@ defmodule LiveEventTest do
       """
     end
 
-    def handle_event(:event, {ButtonComponent, "button-to-view"}, payload, socket) do
+    def handle_emit(:event, {ButtonComponent, "button-to-view"}, payload, socket) do
       {:ok, assign(socket, :payload, payload)}
     end
   end

@@ -9,7 +9,7 @@ defmodule LiveEvent.LiveView do
   to your LiveView module. See `LiveEvent` for more information on how to emit and handle events.
 
   The macro imports `LiveEvent.emit/3` and hooks into the LiveView lifecycle to
-  add support for the `c:LiveEvent.handle_event/4` callback.
+  add support for the `c:LiveEvent.handle_emit/4` callback.
   """
 
   import LiveEvent.Internal
@@ -36,14 +36,14 @@ defmodule LiveEvent.LiveView do
 
   defp handle_info(%LiveEvent.Event{} = event, socket) do
     socket =
-      case get_module(socket).handle_event(
+      case get_module(socket).handle_emit(
              event.name,
              event.source,
              event.payload,
              socket
            ) do
         {:ok, %Phoenix.LiveView.Socket{} = socket} -> socket
-        _unexpected -> raise "expected handle_event/4 to return {:ok, %LiveView.Socket{}}"
+        _unexpected -> raise "expected handle_emit/4 to return {:ok, %LiveView.Socket{}}"
       end
 
     {:halt, socket}
