@@ -77,7 +77,11 @@ by adding `live_event` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
+    # For LiveView 0.16.x and 0.17.x
     {:live_event, "~> 0.2.0"}
+
+    # For LiveView 0.18.x and greater
+    {:live_event, "~> 0.3.0"}
   ]
 end
 ```

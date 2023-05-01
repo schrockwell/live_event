@@ -30,9 +30,9 @@ defmodule LiveEvent.MixProject do
       {:makeup_eex, "~> 0.1.1", only: :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:jason, "~> 1.0", only: :test},
-      {:live_isolated_component, "~> 0.5", only: [:test], runtime: false},
+      {:live_isolated_component, "~> 0.6.4", only: [:test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:phoenix_live_view, "~> 0.16"}
+      {:phoenix_live_view, "~> 0.18"}
     ]
   end
 
