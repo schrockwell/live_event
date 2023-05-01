@@ -94,5 +94,5 @@ defmodule LiveEvent.LiveComponent do
   def __handle_emit__(socket, _assigns), do: socket
 
   def __update_non_event__(socket, %{__message__: %LiveEvent.Event{}}), do: socket
-  def __update_non_event__(socket, assigns), do: Phoenix.LiveView.assign(socket, assigns)
+  def __update_non_event__(socket, assigns), do: Phoenix.Component.assign(socket, assigns)
 end
