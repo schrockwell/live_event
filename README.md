@@ -7,100 +7,99 @@
 
 LiveEvent adds a simple API to LiveViews and LiveComponents:
 
-- `emit/3` to raise an event
-- `handle_emit/4` to handle it
+- `emit/2` to raise an event
+- `handle_emit/2` to handle it
+
+LiveView 0.18+ is supported.
 
 With these two functions, server-side event messages can be handled the same way by both LiveViews and LiveComponents, facilitating the easier design of flexible, reusable components.
 
 Please see [the docs](https://hexdocs.pm/live_event/) for full documentation and examples.
 
-## Usage
-
-Imagine a LiveComponent that has an `:on_selected` event.
-
-```elixir
-# Raise an event from a LiveComponent
-emit(socket, :on_selected, %{id: 123})
-
-# Handle the event on a LiveView, OR another LiveComponent
-def handle_emit(:on_selected, {MyComponent, "component-id"}, %{id: id}, socket), do: ...
-```
-
-To send component events to a LiveView, pass `self()` to the `:on_selected` assign.
-
-To send component events to a LiveComponent, pass `{module, id}` to the `:on_selected` assign.
-
-That's all there is to it.
+**NOTE: There are breaking API changes introduced in v0.4.0. But don't worry, it's for the better.**
 
 ## Example
 
+Let's define a fancy button component that emits a click event with a timestamp.
+
 ```elixir
-defmodule MyLiveComponent do
+defmodule FancyButton do
   use Phoenix.LiveComponent
-  use LiveEvent.LiveComponent # <-- adds lifecycle hooks and imports
+  use LiveEvent.LiveComponent # <-- new!
+
+  def handle_event("click", _, socket) do
+    emit(socket.assigns.on_click, {:click, DateTime.utc_now()})
+    {:noreply, socket}
+  end
 
   def render(assigns) do
     ~H"""
     <button phx-click="click" phx-target={@myself}>Click me</button>
     """
   end
-
-  def handle_event("click", _, socket) do
-    # use emit/3 to send events
-    {:noreply, emit(socket, :on_selected, %{at: DateTime.utc_now()})}
-  end
 end
+```
 
-defmodule MyLiveView do
+And a LiveView that handles that event.
+
+```elixir
+defmodule FancyView do
   use Phoenix.LiveView
-  use LiveEvent.LiveView # <-- adds lifecycle hooks and imports
+  use LiveEvent.LiveView # <-- new!
+
+  def handle_emit({:click, timestamp}, socket) do
+    # ...do something with the event...
+    {:ok, socket}
+  end
 
   def render(assigns) do
     ~H"""
-    <.live_component module={MyLiveComponent} id="my-component" on_selected={self()} />
+    <.live_component module={FancyButton} id="fancy-button" on_click={self()} />
     """
   end
+end
+```
 
-  # use handle_emit/4 to process events - it works on LiveViews AND LiveComponents
-  def handle_emit(:on_selected, {MyLiveComponent, "my-component"}, %{at: at}, socket) do
-    IO.puts("Selected at #{at}")
+Using the exact same syntax, you can also have a LiveComponent handle the same event from the FancyButton.
+
+```elixir
+defmodule ContainerComponent do
+  use Phoenix.LiveComponent
+  use LiveEvent.LiveComponent # <-- new!
+
+  def handle_emit({:click, timestamp}, socket) do
+    # ...do something with the event...
     {:ok, socket}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <.live_component module={FancyButton} id="fancy-button" on_click={{__MODULE__, @id}}} />
+    """
   end
 end
 ```
 
 ## Installation
 
-The package can be installed
-by adding `live_event` to your list of dependencies in `mix.exs`:
+Add the dependency to `mix.exs`:
 
 ```elixir
 def deps do
-  [
-    # For LiveView 0.16.x and 0.17.x
-    {:live_event, "~> 0.2.0"}
-
-    # For LiveView 0.18.x and greater
-    {:live_event, "~> 0.3.0"}
-  ]
+  {:live_event, "~> 0.4.0"}
 end
 ```
 
-For Phoenix projects, add the LiveEvent hooks to the `live_view` and `live_component` macros.
+Update `MyAppWeb` to include the integrations:
 
 ```elixir
-# lib/my_app_web.ex
-defmodule MyAppWeb do
+def MyAppWeb do
   def live_view do
-    quote do
-      use LiveEvent.LiveView
-    end
+    use LiveEvent.LiveView
   end
 
   def live_component do
-    quote do
-      use LiveEvent.LiveComponent
-    end
+    use LiveEvent.LiveComponent
   end
 end
 ```
