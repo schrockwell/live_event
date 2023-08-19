@@ -55,18 +55,22 @@ defmodule LiveEvent.LiveComponent do
       quote do
         defoverridable update: 2
 
+        def update(%{__message__: %LiveEvent.Event{} = event} = assigns, socket) do
+          {:ok, LiveEvent.LiveComponent.__handle_emit__(socket, event)}
+        end
+
         def update(assigns, socket) do
-          socket = LiveEvent.LiveComponent.__handle_emit__(socket, assigns)
           super(assigns, socket)
         end
       end
     else
       quote do
+        def update(%{__message__: %LiveEvent.Event{} = event} = assigns, socket) do
+          {:ok, LiveEvent.LiveComponent.__handle_emit__(socket, event)}
+        end
+
         def update(assigns, socket) do
-          {:ok,
-           socket
-           |> LiveEvent.LiveComponent.__handle_emit__(assigns)
-           |> LiveEvent.LiveComponent.__update_non_event__(assigns)}
+          {:ok, Phoenix.Component.assign(socket, assigns)}
         end
       end
     end
@@ -76,7 +80,7 @@ defmodule LiveEvent.LiveComponent do
     put_module(socket, module)
   end
 
-  def __handle_emit__(socket, %{__message__: %LiveEvent.Event{} = event}) do
+  def __handle_emit__(socket, %LiveEvent.Event{} = event) do
     case get_module(socket).handle_emit(
            event.name,
            event.source,
@@ -90,9 +94,4 @@ defmodule LiveEvent.LiveComponent do
         raise "expected handle_emit/4 callback to return {:ok, %LiveView.Socket{}}"
     end
   end
-
-  def __handle_emit__(socket, _assigns), do: socket
-
-  def __update_non_event__(socket, %{__message__: %LiveEvent.Event{}}), do: socket
-  def __update_non_event__(socket, assigns), do: Phoenix.Component.assign(socket, assigns)
 end

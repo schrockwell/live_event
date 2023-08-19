@@ -29,6 +29,10 @@ defmodule LiveEventTest do
       {:ok, assign(socket, :payload, nil)}
     end
 
+    def update(%{assign: :testing} = assigns, socket) do
+      {:ok, assign(socket, assigns)}
+    end
+
     def handle_emit(:event, _source, payload, socket) do
       {:ok, assign(socket, :payload, payload)}
     end
@@ -49,7 +53,7 @@ defmodule LiveEventTest do
         <.live_component module={ButtonComponent} id="button-to-view" event={self()} />
         <.live_component module={ButtonComponent} id="button-to-component" event={{InspectComponent, "inspect-in-component"}} />
 
-        <.live_component module={InspectComponent} id="inspect-in-component" />
+        <.live_component module={InspectComponent} id="inspect-in-component" assign={:testing} />
         <div id="inspect-in-view"><%= inspect(@payload) %></div>
       </div>
       """
