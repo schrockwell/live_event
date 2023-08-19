@@ -15,35 +15,25 @@ defmodule LiveEventTest.Assertions do
 
   ## Example
 
-      # On a LiveComponent with the :on_clicked event assign set to self()
-      emit(socket, :on_clicked, %{id: 123})
+      # On a LiveComponent with the :on_click event assign set to self(), the test
+      emit(socket.assigns.on_click, {:click, 123})
 
       # In the test
-      assert_receive_event :on_clicked, _source, %{id: 123}
+      assert_receive_event {:click, 123}
 
   """
   @spec assert_receive_event(
-          event_name :: atom,
-          source :: any,
           payload :: any,
           timeout :: non_neg_integer() | nil,
           failure_message :: String.t() | nil
         ) :: any
   defmacro assert_receive_event(
-             event_name,
-             source,
              payload,
              timeout \\ nil,
              failure_message \\ nil
            ) do
     quote do
-      assert_receive %LiveEvent.Event{
-                       name: unquote(event_name),
-                       source: unquote(source),
-                       payload: unquote(payload)
-                     },
-                     unquote(timeout),
-                     unquote(failure_message)
+      assert_receive %LiveEvent.Event{payload: unquote(payload)}, unquote(timeout), unquote(failure_message)
     end
   end
 
@@ -55,27 +45,20 @@ defmodule LiveEventTest.Assertions do
 
   ## Example
 
-      # On a LiveComponent with the :on_clicked event assign set to self()
-      emit(socket, :on_clicked, %{id: 123})
+      # On a LiveComponent with the :on_click event assign set to self()
+      emit(socket.assigns.on_click, {:click, 123})
 
       # In the test
-      assert_received_event :on_clicked, _source, %{id: 123}
+      assert_received_event {:click, 123}
 
   """
   @spec assert_received_event(
-          event_name :: atom,
-          source :: any,
           payload :: any,
           failure_message :: String.t() | nil
         ) :: any
-  defmacro assert_received_event(event_name, source, payload, failure_message \\ nil) do
+  defmacro assert_received_event(payload, failure_message \\ nil) do
     quote do
-      assert_received %LiveEvent.Event{
-                        name: unquote(event_name),
-                        source: unquote(source),
-                        payload: unquote(payload)
-                      },
-                      unquote(failure_message)
+      assert_received %LiveEvent.Event{payload: unquote(payload)}, unquote(failure_message)
     end
   end
 
@@ -87,33 +70,25 @@ defmodule LiveEventTest.Assertions do
 
   ## Example
 
-      # On a LiveComponent with the :on_clicked event assign set to self()
-      emit(socket, :on_clicked, %{id: 123})
+      # On a LiveComponent with the :on_click event assign set to self()
+      emit(socket.assigns.on_click, {:clicked, 123})
 
       # In the test
-      refute_receive_event :on_clicked, _source, %{id: 123}
+      refute_receive_event {:click, 456}
 
   """
   @spec refute_receive_event(
-          event_name :: atom,
-          source :: any,
           payload :: any,
           timeout :: non_neg_integer() | nil,
           failure_message :: String.t() | nil
         ) :: any
   defmacro refute_receive_event(
-             event_name,
-             source,
              payload,
              timeout \\ nil,
              failure_message \\ nil
            ) do
     quote do
-      refute_receive %LiveEvent.Event{
-                       name: unquote(event_name),
-                       source: unquote(source),
-                       payload: unquote(payload)
-                     },
+      refute_receive %LiveEvent.Event{payload: unquote(payload)},
                      unquote(timeout),
                      unquote(failure_message)
     end
@@ -127,26 +102,20 @@ defmodule LiveEventTest.Assertions do
 
   ## Example
 
-      # On a LiveComponent with the :on_clicked event assign set to self()
-      emit(socket, :on_clicked, %{id: 123})
+      # On a LiveComponent with the :on_click event assign set to self()
+      emit(socket.assigns.on_click, {:clicked, 123})
 
       # In the test
-      refute_received_event :on_clicked, _source, %{id: 123}
+      refute_received_event {:clicked, 456}
 
   """
   @spec refute_received_event(
-          event_name :: atom,
-          source :: any,
           payload :: any,
           failure_message :: String.t() | nil
         ) :: any
-  defmacro refute_received_event(event_name, source, payload, failure_message \\ nil) do
+  defmacro refute_received_event(payload, failure_message \\ nil) do
     quote do
-      refute_received %LiveEvent.Event{
-                        name: unquote(event_name),
-                        source: unquote(source),
-                        payload: unquote(payload)
-                      },
+      refute_received %LiveEvent.Event{payload: unquote(payload)},
                       unquote(failure_message)
     end
   end

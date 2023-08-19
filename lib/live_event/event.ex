@@ -4,17 +4,12 @@ defmodule LiveEvent.Event do
 
   This is documented in the unlikely chance that the destination process or component needs to directly handle it.
 
-  This struct should not be constructed directly by the developer - use `LiveEvent.send_event/4`
-  and `LiveEvent.emit/3` instead.
+  This struct should not be constructed directly by the developer - use `LiveEvent.emit/2` instead.
   """
 
   @type t :: %__MODULE__{
-          name: atom,
-          payload: any,
-          source: any
+          payload: any
         }
 
-  @type destination :: pid | {module, String.t() | atom}
-
-  defstruct [:name, :payload, :source]
+  defstruct [:payload]
 end
