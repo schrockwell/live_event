@@ -15,12 +15,13 @@ defmodule LiveEventTest do
   end
 
   defcomponent ButtonComponent do
-    def handle_event("event", params, socket) do
-      {:noreply, emit(socket, :event, params)}
+    def handle_event("click", params, socket) do
+      emit(socket.assigns.on_click, {:payload, params})
+      {:noreply, socket}
     end
 
     def render(assigns) do
-      ~H[<button id={@id} phx-click="event" phx-target={@myself}>Click me</button>]
+      ~H[<button id={@id} phx-click="click" phx-target={@myself}>Click me</button>]
     end
   end
 
@@ -33,7 +34,7 @@ defmodule LiveEventTest do
       {:ok, assign(socket, assigns)}
     end
 
-    def handle_emit(:event, _source, payload, socket) do
+    def handle_emit({:payload, payload}, socket) do
       {:ok, assign(socket, :payload, payload)}
     end
 
@@ -50,8 +51,8 @@ defmodule LiveEventTest do
     def render(assigns) do
       ~H"""
       <div>
-        <.live_component module={ButtonComponent} id="button-to-view" event={self()} />
-        <.live_component module={ButtonComponent} id="button-to-component" event={{InspectComponent, "inspect-in-component"}} />
+        <.live_component module={ButtonComponent} id="button-to-view" on_click={self()} />
+        <.live_component module={ButtonComponent} id="button-to-component" on_click={{InspectComponent, "inspect-in-component"}} />
 
         <.live_component module={InspectComponent} id="inspect-in-component" assign={:testing} />
         <div id="inspect-in-view"><%= inspect(@payload) %></div>
@@ -59,7 +60,7 @@ defmodule LiveEventTest do
       """
     end
 
-    def handle_emit(:event, {ButtonComponent, "button-to-view"}, payload, socket) do
+    def handle_emit({:payload, payload}, socket) do
       {:ok, assign(socket, :payload, payload)}
     end
   end
